@@ -85,10 +85,21 @@ All responses are JSON unless noted. CORS is open for GET/POST/PUT/DELETE.
 
 - POST `/adduser`
   - Required: `username, password, email, mobile`
-  - Optional: `name, role, location, roles (object)`
+  - Optional: `name, role, location, roles (object), time`
+  - Time parameter:
+    - Predefined values: `"Lifetime"`, `"3 days"`, `"1 week"`, `"1 month"`
+    - Custom datetime: 14-digit string format `YYYYMMDDHHmmss` (e.g., `"20251225143000"` for Dec 25, 2025 at 14:30:00)
+    - Must be a valid future date if using custom datetime
+    - Defaults to `"3 days"` if not provided
   - 201: `{ res: "user created", user: { id, username, email, role, created_at } }`
   - 200: `{ res: "email exists" }` or `{ res: "username exists" }`
+  - 400: `{ res: "error", message: "Invalid time format: ..." }` for invalid time values
   - 400/500: error objects with `{ res: "error", message: string }`
+
+- GET `/getallusers` (requires authentication & Admin/Platform Developer role)
+  - Returns all non-deleted users with their properties including `usertime`
+  - 200: `{ res: "users fetched", users: [ { username, name, email, role, location, mobilenumber, usertime, ... } ] }`
+  - The `usertime` field contains either predefined values or custom datetime (14-digit format)
 
 ### User preferences (GET updates)
 
